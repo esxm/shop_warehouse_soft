@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const environmentSchema = z.object({
+const appEnvironmentSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
@@ -8,12 +8,28 @@ const environmentSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.url().default("http://localhost:3000"),
 });
 
-export type Environment = z.infer<typeof environmentSchema>;
+const publicEnvironmentSchema = appEnvironmentSchema.extend({
+  NEXT_PUBLIC_SUPABASE_URL: z
+    .url()
+    .refine((value) => ["http:", "https:"].includes(new URL(value).protocol), {
+      error: "Must use the http or https protocol",
+    }),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().trim().min(1),
+});
 
-export function parseEnvironment(
+const serverEnvironmentSchema = publicEnvironmentSchema.extend({
+  SUPABASE_SERVICE_ROLE_KEY: z.string().trim().min(1),
+});
+
+export type AppEnvironment = z.infer<typeof appEnvironmentSchema>;
+export type PublicEnvironment = z.infer<typeof publicEnvironmentSchema>;
+export type ServerEnvironment = z.infer<typeof serverEnvironmentSchema>;
+
+function parseSchema<TSchema extends z.ZodType>(
+  schema: TSchema,
   source: Record<string, string | undefined>,
-): Environment {
-  const result = environmentSchema.safeParse(source);
+): z.output<TSchema> {
+  const result = schema.safeParse(source);
 
   if (!result.success) {
     const details = result.error.issues
@@ -26,8 +42,20 @@ export function parseEnvironment(
   return result.data;
 }
 
-export const env = parseEnvironment({
-  NODE_ENV: process.env.NODE_ENV,
-  NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
-  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-});
+export function parseEnvironment(
+  source: Record<string, string | undefined>,
+): AppEnvironment {
+  return parseSchema(appEnvironmentSchema, source);
+}
+
+export function parsePublicEnvironment(
+  source: Record<string, string | undefined>,
+): PublicEnvironment {
+  return parseSchema(publicEnvironmentSchema, source);
+}
+
+export function parseServerEnvironment(
+  source: Record<string, string | undefined>,
+): ServerEnvironment {
+  return parseSchema(serverEnvironmentSchema, source);
+}

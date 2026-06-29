@@ -3,9 +3,8 @@
 ## System shape
 
 The application is a single Next.js App Router deployment written in strict
-TypeScript. React and Tailwind CSS provide the interface. Later steps will add
-Supabase PostgreSQL and Auth through `@supabase/ssr` and
-`@supabase/supabase-js`.
+TypeScript. React and Tailwind CSS provide the interface. Supabase PostgreSQL
+and Auth are accessed through `@supabase/ssr` and `@supabase/supabase-js`.
 
 ```text
 Browser
@@ -22,7 +21,9 @@ Supabase
   |-- transactional RPC functions for atomic financial writes
 ```
 
-No database, authentication, or business transaction code exists in Step 0.
+Step 1 configures connectivity and cookie-based session refresh. Authentication
+screens, authorization, database schema, and business transactions are added in
+later steps.
 
 ## Boundaries
 
@@ -31,6 +32,8 @@ No database, authentication, or business transaction code exists in Step 0.
 - `lib/validation/` owns shared Zod schemas.
 - `lib/auth/` owns reusable authentication and permission checks.
 - `lib/db/` owns Supabase clients and generated database types.
+- `lib/env/public.ts` exposes only validated public configuration.
+- `lib/env/server.ts` is marked server-only and owns privileged configuration.
 - `lib/money/` owns decimal-safe parsing, arithmetic, and formatting.
 - `services/` coordinates authorized business operations.
 - `supabase/migrations/` is the source of truth for schema, constraints, RLS,
@@ -41,10 +44,22 @@ transactions enforce them, while RLS provides a second authorization boundary.
 
 ## Security model
 
-Public browser modules may use only Supabase public credentials. Privileged
-credentials stay in server-only modules. Every write will validate input with
-Zod, authorize on the server, and remain constrained by RLS. Hiding a navigation
-item is not authorization.
+Public browser modules use only the project URL and public key. The privileged
+client and service-role environment value are isolated behind `server-only`.
+Every future write will validate input with Zod, authorize on the server, and
+remain constrained by RLS. Hiding a navigation item is not authorization.
+
+Next.js 16 `proxy.ts` creates a request-scoped Supabase server client and calls
+`auth.getClaims()` to verify or refresh a present session. The proxy propagates
+all refreshed cookies and required no-cache headers. Route authorization does
+not rely on the proxy and will be implemented server-side in Step 3.
+
+Client usage is separated by runtime:
+
+- Browser components use `lib/db/browser.ts`.
+- Server Components, actions, and route handlers use `lib/db/server.ts`.
+- Explicitly authorized administrative operations may use `lib/db/admin.ts`.
+  That client bypasses RLS, so importing it is restricted to server code.
 
 ## Data and money
 
@@ -60,6 +75,8 @@ derived from immutable entries and allocations.
 - Database integration tests will verify constraints, RLS, transactions, and
   financial invariants after Supabase is introduced.
 - Playwright covers critical workflows in a running application.
+- The Supabase health route probes the Auth health endpoint with the public key,
+  returns only `ok` or `unavailable`, and is never cached.
 
 Every implementation step must pass lint, strict type checking, unit tests,
 relevant end-to-end tests, and a production build before it is complete.

@@ -12,3 +12,15 @@ test("shows the responsive project foundation", async ({ page }) => {
     page.getByRole("navigation", { name: "Primary navigation" }),
   ).toBeVisible();
 });
+
+test("returns a redacted Supabase health response", async ({ request }) => {
+  const response = await request.get("/api/health/supabase");
+  const payload: unknown = await response.json();
+
+  expect([200, 503]).toContain(response.status());
+  expect(payload).toEqual({
+    service: "supabase",
+    status: response.ok() ? "ok" : "unavailable",
+  });
+  expect(JSON.stringify(payload)).not.toContain("local-development");
+});

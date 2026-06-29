@@ -10,8 +10,8 @@ only the application and test foundation.
 - npm 10+
 - Git
 
-The Node.js ranges match the current linting toolchain. No database is needed
-until the Supabase connection is introduced in Step 1.
+The Node.js ranges match the current linting toolchain. A Supabase project is
+required for live connectivity.
 
 ## Local setup
 
@@ -23,6 +23,9 @@ copy .env.example .env.local
 npm run dev
 ```
 
+Replace every Supabase placeholder in `.env.local` before starting the app.
+Missing variables stop startup with a validation error.
+
 Open [http://localhost:3000](http://localhost:3000).
 
 On macOS or Linux, replace the `copy` command with:
@@ -30,6 +33,9 @@ On macOS or Linux, replace the `copy` command with:
 ```bash
 cp .env.example .env.local
 ```
+
+See [docs/supabase.md](./docs/supabase.md) for project creation, key handling,
+connectivity checks, and migrations.
 
 ## Quality commands
 
@@ -55,6 +61,7 @@ app/                    Next.js App Router pages and layouts
 components/             Shared React components
 lib/auth/               Authentication and authorization helpers
 lib/db/                 Database clients and generated types
+lib/env/                Browser-safe and server-only environment access
 lib/money/              Decimal-safe money utilities
 lib/validation/         Shared Zod schemas
 services/               Server-side application services
@@ -63,6 +70,18 @@ tests/unit/             Vitest and Testing Library tests
 tests/e2e/              Playwright tests
 docs/                   Architecture, rules, and delivery status
 ```
+
+## Supabase connectivity
+
+With the development server running:
+
+```bash
+curl http://localhost:3000/api/health/supabase
+```
+
+The route returns HTTP 200 with `{"service":"supabase","status":"ok"}` when
+Supabase Auth is reachable. Failures return HTTP 503 without upstream details
+or credentials.
 
 ## Delivery rules
 
