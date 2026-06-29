@@ -38,6 +38,8 @@ later steps.
 - `services/` coordinates authorized business operations.
 - `supabase/migrations/` is the source of truth for schema, constraints, RLS,
   and database functions.
+- `supabase/tests/` contains pgTAP integration tests for constraints, tenant
+  isolation, roles, and database invariants.
 
 React components must not implement financial invariants. Services and database
 transactions enforce them, while RLS provides a second authorization boundary.
@@ -60,6 +62,12 @@ Client usage is separated by runtime:
 - Server Components, actions, and route handlers use `lib/db/server.ts`.
 - Explicitly authorized administrative operations may use `lib/db/admin.ts`.
   That client bypasses RLS, so importing it is restricted to server code.
+
+Tenant membership and role checks are database-enforced. Security-definer
+helpers live in the unexposed `private` schema to avoid recursive membership
+policies. All helpers set an empty search path. The public bootstrap RPC is the
+only client-callable path that creates a business; it atomically creates the
+first admin, required locations, required accounts, and an audit record.
 
 ## Data and money
 

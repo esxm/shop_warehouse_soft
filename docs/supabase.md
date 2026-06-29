@@ -84,3 +84,21 @@ npx supabase db reset
 ```
 
 Do not expose the local stack to an untrusted network.
+
+The repository includes convenience commands:
+
+```bash
+npm run db:start
+npm run db:start:test
+npm run db:reset
+npm run db:lint
+npm run db:test
+npm run db:types
+npm run db:stop
+```
+
+Use `db:start:test` for database-only schema work. It avoids downloading and
+running unrelated local Supabase services.
+
+See [database-foundation.md](./database-foundation.md) for the Step 2 schema,
+bootstrap RPC, RLS model, and database test coverage.

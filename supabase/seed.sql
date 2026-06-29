@@ -1,0 +1,7 @@
+-- Foundation data is user-scoped and must not be seeded with hard-coded auth IDs.
+-- After signing in as the initial administrator, call:
+--
+-- select public.create_business_foundation(
+--   'Your Business Name',
+--   'Europe/Bucharest'
+-- );

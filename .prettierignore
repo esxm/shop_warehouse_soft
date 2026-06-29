@@ -6,3 +6,4 @@ playwright-report
 test-results
 package-lock.json
 shop_warehouse_codex_implementation_plan.md
+supabase/.temp
