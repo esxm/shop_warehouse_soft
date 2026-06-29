@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shop & Warehouse Management System
 
-## Getting Started
+A responsive financial-control and inventory-value application for a small shop
+and warehouse. The project is being delivered incrementally; Step 0 contains
+only the application and test foundation.
 
-First, run the development server:
+## Prerequisites
+
+- Node.js 20.19+, 22.13+, or 24+
+- npm 10+
+- Git
+
+The Node.js ranges match the current linting toolchain. No database is needed
+until the Supabase connection is introduced in Step 1.
+
+## Local setup
 
 ```bash
+git clone <repository-url>
+cd shop-warehouse-soft
+npm install
+copy .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+On macOS or Linux, replace the `copy` command with:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cp .env.example .env.local
+```
 
-## Learn More
+## Quality commands
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run test:e2e
+npm run build
+npm run format:check
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Install the Playwright browser once before the first end-to-end run:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npx playwright install chromium
+```
 
-## Deploy on Vercel
+## Project structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```text
+app/                    Next.js App Router pages and layouts
+components/             Shared React components
+lib/auth/               Authentication and authorization helpers
+lib/db/                 Database clients and generated types
+lib/money/              Decimal-safe money utilities
+lib/validation/         Shared Zod schemas
+services/               Server-side application services
+supabase/migrations/    Ordered PostgreSQL migrations
+tests/unit/             Vitest and Testing Library tests
+tests/e2e/              Playwright tests
+docs/                   Architecture, rules, and delivery status
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Delivery rules
+
+Work follows
+[`shop_warehouse_codex_implementation_plan.md`](./shop_warehouse_codex_implementation_plan.md).
+Only one implementation step should be completed and verified at a time.
