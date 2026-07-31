@@ -354,8 +354,8 @@ select extensions.is(
 );
 select extensions.is(
   (select count(*) from public.business_members),
-  2::bigint,
-  'employee sees memberships only in their own business'
+  1::bigint,
+  'employee sees only their own membership row'
 );
 
 select * from extensions.finish();

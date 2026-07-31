@@ -1,8 +1,9 @@
 # Shop & Warehouse Management System
 
 A responsive financial-control and inventory-value application for a small shop
-and warehouse. The project is being delivered incrementally; Step 0 contains
-only the application and test foundation.
+and warehouse. The project is delivered incrementally. Steps 0-3 provide the
+application foundation, Supabase connectivity, tenant database foundation, and
+authenticated role-aware access.
 
 ## Prerequisites
 
@@ -35,7 +36,9 @@ cp .env.example .env.local
 ```
 
 See [docs/supabase.md](./docs/supabase.md) for project creation, key handling,
-connectivity checks, and migrations.
+connectivity checks, migrations, Auth redirects, and employee invitations.
+See [docs/security.md](./docs/security.md) for the threat model, implemented
+controls, and remaining deployment risks.
 
 ## Quality commands
 

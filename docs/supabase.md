@@ -54,7 +54,29 @@ key, upstream body, version, or exception.
 The browser and server clients use `@supabase/ssr`. Next.js 16 runs
 `proxy.ts` for application requests to verify or refresh a present session with
 `auth.getClaims()`. Static assets are excluded. The proxy does not authorize
-routes; protected routes and role checks are implemented in Step 3.
+routes. Protected layouts and every privileged server action load the verified
+user and active business membership on the server.
+
+## Authentication and employee invitations
+
+Email/password authentication is enabled through Supabase Auth. Before using
+the administrator's **Users** page in a remote project:
+
+1. Set the Supabase Auth **Site URL** to the deployed application URL.
+2. Add `<NEXT_PUBLIC_APP_URL>/auth/invite` to the Auth redirect allow list.
+3. Configure a production SMTP provider. Supabase's development email service
+   is not suitable for production delivery.
+4. Ensure `NEXT_PUBLIC_APP_URL` exactly matches the public application origin.
+
+The administrator invite action uses the server-only key to send the Auth
+invitation. The authenticated `add_business_employee` RPC independently checks
+the administrator role, adds only the `employee` role, and writes the audit
+record in the same database transaction. If that operation fails, the newly
+invited Auth user is removed as compensation.
+
+For local Supabase, invitation messages are captured by Mailpit at
+`http://127.0.0.1:54324`. The local redirect allow list is configured in
+`supabase/config.toml`.
 
 ## Apply migrations
 
@@ -100,5 +122,9 @@ npm run db:stop
 Use `db:start:test` for database-only schema work. It avoids downloading and
 running unrelated local Supabase services.
 
-See [database-foundation.md](./database-foundation.md) for the Step 2 schema,
-bootstrap RPC, RLS model, and database test coverage.
+See [database-foundation.md](./database-foundation.md) for the foundation
+schema, initial administrator bootstrap RPC, RLS model, and database test
+coverage.
+
+See [dashboard.md](./dashboard.md) for dashboard source views, net-value
+formulas, and the USD/RON reference-rate model.

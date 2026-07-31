@@ -18,3 +18,35 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
 }
+
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 3px solid #14b8a6;
+  outline-offset: 2px;
+}
+
+:where(a, button, summary, label, input, select, textarea) {
+  touch-action: manipulation;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 1.25rem;
+  min-width: 1.25rem;
+}
+
+button {
+  min-height: 2.75rem;
+}
+
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}

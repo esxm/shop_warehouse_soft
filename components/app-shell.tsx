@@ -1,61 +1,49 @@
 import type { ReactNode } from "react";
 
-const navigationItems = [
-  "Dashboard",
-  "Daily Sales",
-  "Customers",
-  "Suppliers",
-  "Cash & Bank",
-  "Inventory Value",
-  "Expenses",
-  "Reports",
-] as const;
+import { logout } from "@/app/(protected)/actions";
+import { PrimaryNavigation } from "@/components/primary-navigation";
+import type { CurrentUserContext } from "@/lib/auth/types";
 
 type AppShellProps = Readonly<{
   children: ReactNode;
+  context: CurrentUserContext;
 }>;
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, context }: AppShellProps) {
   return (
     <div className="min-h-screen bg-slate-100">
       <header className="border-b border-slate-200 bg-slate-950 text-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div>
-            <p className="text-lg font-bold tracking-tight">Shop & Warehouse</p>
-            <p className="text-xs text-slate-400">Management system</p>
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:gap-4 sm:px-6 lg:px-8">
+          <div className="min-w-0">
+            <p className="truncate text-base font-bold tracking-tight sm:text-lg">
+              Shop & Warehouse
+            </p>
+            <p className="truncate text-xs text-slate-400">
+              {context.business.name}
+            </p>
           </div>
-          <span className="rounded-full bg-teal-400/15 px-3 py-1 text-xs font-semibold text-teal-300">
-            Foundation
-          </span>
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="hidden text-right sm:block">
+              <p className="max-w-52 truncate text-sm font-semibold">
+                {context.user.displayName}
+              </p>
+              <p className="text-xs capitalize text-slate-400">
+                {context.role}
+              </p>
+            </div>
+            <form action={logout}>
+              <button
+                className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:text-white"
+                type="submit"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
-        <nav
-          aria-label="Primary navigation"
-          className="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6 lg:px-8"
-        >
-          <ul className="flex min-w-max gap-1 pb-3">
-            {navigationItems.map((item, index) => (
-              <li key={item}>
-                <a
-                  aria-current={index === 0 ? "page" : undefined}
-                  className={
-                    index === 0
-                      ? "block rounded-lg bg-white px-3 py-2 text-sm font-semibold text-slate-950"
-                      : "block rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white"
-                  }
-                  href={
-                    index === 0
-                      ? "/"
-                      : `#${item.toLowerCase().replaceAll(" ", "-")}`
-                  }
-                >
-                  {item}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <PrimaryNavigation role={context.role} />
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <main className="mx-auto max-w-7xl px-3 py-5 sm:px-6 sm:py-12 lg:px-8">
         {children}
       </main>
     </div>
